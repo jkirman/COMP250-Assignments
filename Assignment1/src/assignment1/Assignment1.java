@@ -93,7 +93,7 @@ public class Assignment1
 		new Professor("Joelle Pineau", "http://www.cs.mcgill.ca/~jpineau/research.html"),
 		new Professor("Doina Precup", "http://www.cs.mcgill.ca/~dprecup/"),
 		new Professor("Bruce Reed", "http://en.wikipedia.org/wiki/Bruce_Reed_%28mathematician%29"),
-		new Professor("Derek Ruths", "http://www.derekruths.com/research/"),
+		new Professor("Derek Ruths", "http://www.derekruths.com/research/"), // This page frequently times out
 		new Professor("Kaleem Siddiqi", "http://www.cim.mcgill.ca/~shape/"),
 		new Professor("Denis Thérien", "http://www.cs.mcgill.ca/~denis/"),
 		new Professor("Carl Tropper", "http://www.cs.mcgill.ca/~carl/"),
@@ -110,7 +110,7 @@ public class Assignment1
 	 * A set of keywords describing an area of interest. Does not have to be sorted, 
 	 * but must not contain any duplicates.
 	 */
-	private static String[] QUERY = {"sjksjdfhsdkjfh"};//"programming", "engineering", "design"};
+	private static String[] QUERY = {"programming", "engineering", "design"};
 	
 	/**
 	 * Words with low information content that we want to exclude from the similarity

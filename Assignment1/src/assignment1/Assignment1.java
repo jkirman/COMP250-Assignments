@@ -8,6 +8,7 @@
  * 21/01/15: Removed stop words from retrieved webpage data.
  * 22/01/15 1200: Added comments and cleaned up code.
  * 22/01/15 1220: Added more comments.
+ * 22/01/15 1306: Fixed the findMaxDouble method.
  */
 
 package assignment1;
@@ -431,8 +432,10 @@ public class Assignment1
 		}
 		
 		int index = 0;
+		double largest = array[0];
 		for (int i = 1; i < array.length; i++) {
-			if (array[i] > array[i-1]) {
+			if (largest > array[i-1]) {
+				largest = array[i];
 				index = i;
 			}
 		}

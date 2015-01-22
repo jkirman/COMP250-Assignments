@@ -6,7 +6,8 @@
  * LOG
  * 17/01/15: Completed assignment.
  * 21/01/15: Removed stop words from retrieved webpage data.
- * 22/01/15: Added comments and cleaned up code.
+ * 22/01/15 1200: Added comments and cleaned up code.
+ * 22/01/15 1220: Added more comments.
  */
 
 package assignment1;
@@ -124,7 +125,8 @@ public class Assignment1
 		"in", "is", "it", "of", "on", "she", "the", "this", "to", "with" };
 	
 	/**
-	 * List of all punctuation that is to be considered not useful for word searching.
+	 * List of all punctuation that is to be considered not useful for word searching. Includes special characters such as
+	 * \t (horizontal tab), \n (line break), \r (line break), \u00A0 (no break space), \u2007 (figure space), \u202F (narrow no break space).
 	 */
 	private static char[] PUNCTUATION = {',','.','!','?',';',':','"','\'','(',')','[',']','/','·',
 		'\t', '\n', '\r', '©','\u00A0', '\u2007', '\u202F'};

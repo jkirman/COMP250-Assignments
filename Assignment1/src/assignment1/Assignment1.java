@@ -9,6 +9,7 @@
  * 22/01/15 1200: Added comments and cleaned up code.
  * 22/01/15 1220: Added more comments.
  * 22/01/15 1306: Fixed the findMaxDouble method.
+ * 22/01/15 1352: Further fixed the findMaxDouble method.
  */
 
 package assignment1;
@@ -434,7 +435,7 @@ public class Assignment1
 		int index = 0;
 		double largest = array[0];
 		for (int i = 1; i < array.length; i++) {
-			if (largest > array[i-1]) {
+			if (largest > array[i]) {
 				largest = array[i];
 				index = i;
 			}

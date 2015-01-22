@@ -1,3 +1,14 @@
+/*
+ * COMP 250 - Assignment 1
+ * Completed by: Jeffrey Kirman (2604933698)
+ * Professor: Martin Robillard
+ * 
+ * LOG
+ * 17/01/15: Completed assignment.
+ * 21/01/15: Removed stop words from retrieved webpage data.
+ * 22/01/15: Added comments and cleaned up code.
+ */
+
 package assignment1;
 
 import java.io.IOException;
@@ -99,7 +110,7 @@ public class Assignment1
 	 * A set of keywords describing an area of interest. Does not have to be sorted, 
 	 * but must not contain any duplicates.
 	 */
-	private static String[] QUERY = {"programming", "engineering", "design"};
+	private static String[] QUERY = {"sjksjdfhsdkjfh"};//"programming", "engineering", "design"};
 	
 	/**
 	 * Words with low information content that we want to exclude from the similarity
@@ -141,14 +152,15 @@ public class Assignment1
 	{
 		assert pQuery != null;
 		
-		double[] jaccardIndex = new double[PROFESSORS.length];
-		boolean noMatch = true;
+		double[] jaccardIndex = new double[PROFESSORS.length]; // Array which contains the Jaccard index of each professor
+		boolean noMatch = true; // Boolean which is true if all Jaccard indices of professors are 0.
 		
+		// Obtains words from each professor's webpage, removes stop words from them, and calculates the Jaccard index
 		for (int i = 0; i < PROFESSORS.length; i++) {
 			jaccardIndex[i] = jaccardIndex(removeStopWords(obtainWordsFromPage(PROFESSORS[i].getWebPageUrl())), pQuery);
 		}
 		
-		// Check to see if the there are any matches at all
+		// Check to see if all Jaccard indices are 0
 		for (int i = 0; i < jaccardIndex.length; i++) {
 			if (jaccardIndex[i] != 0) {
 				noMatch = false;
@@ -172,8 +184,9 @@ public class Assignment1
 	{
 		assert pDocument != null && pQuery != null;
 		
-		int intersectionCount = 0;
+		int intersectionCount = 0; // The count of intersections
 		
+		// Does a binary search for each element in pQuery in pDocument; if there is a result, the count of intersections is incremented
 		for (int i = 0; i < pQuery.length; i++) {
 			if (Arrays.binarySearch(pDocument, pQuery[i]) >= 0) {
 				intersectionCount++;
@@ -193,16 +206,18 @@ public class Assignment1
 	public static String bestMatchRelHits(String[] pQuery) throws IOException
 	{
 		assert pQuery != null;
-		double[] relHits = new double[PROFESSORS.length];
-		String[] currentPage;
-		boolean noMatch = true;
 		
+		double[] relHits = new double[PROFESSORS.length]; // Array which contains the relative hits index of each professor
+		String[] currentPage; // Array which contains the words on a web page of a professor
+		boolean noMatch = true; // Boolean which is true if all relative hits of professors are 0.
+		
+		// Obtains words from each professor's webpage, removes stop words from them, and calculates the relative hits
 		for (int i = 0; i < PROFESSORS.length; i++) {
 			currentPage = removeStopWords(obtainWordsFromPage(PROFESSORS[i].getWebPageUrl()));
 			relHits[i] = ((double)numberOfHits(currentPage, pQuery))/((double)currentPage.length);
 		}
 		
-		// Check to see if the there are any matches at all
+		// Check to see if all relative hits are 0
 		for (int i = 0; i < relHits.length; i++) {
 			if (relHits[i] != 0) {
 				noMatch = false;
@@ -224,7 +239,7 @@ public class Assignment1
 	public static double jaccardIndex(String[] pDocument, String[] pQuery)
 	{
 		assert pDocument != null && pQuery != null;
-		return ((double)intersectionSize(pDocument, pQuery))/((double)unionSize(pDocument,pQuery)); // TODO
+		return ((double)intersectionSize(pDocument, pQuery))/((double)unionSize(pDocument,pQuery)); // Returns |intersection(pDocument,pQuery)|/|union(pDocument,pQuery)|
 	}
 	
 	/**
@@ -324,7 +339,7 @@ public class Assignment1
 			notStopWord = 0;
 		}
 		
-		// returns a truncated copy of the result array
+		// returns a truncated copy of the result array (omitting null indices)
 		return Arrays.copyOf(temp,count);
 	}
 	
@@ -422,6 +437,10 @@ public class Assignment1
 		return index;
 	}
 	
+	/**
+	 * Helper method that prints an array of strings in one line with a space between each string.
+	 * @param array An array of type String.
+	 */
 	public static void printStringArray(String[] array) {
 		for (int i = 0; i < array.length; i++) {
 			System.out.print(array[i] + " ");

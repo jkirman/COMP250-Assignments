@@ -145,7 +145,7 @@ public class Assignment1
 		boolean noMatch = true;
 		
 		for (int i = 0; i < PROFESSORS.length; i++) {
-			jaccardIndex[i] = jaccardIndex(obtainWordsFromPage(PROFESSORS[i].getWebPageUrl()), pQuery);
+			jaccardIndex[i] = jaccardIndex(removeStopWords(obtainWordsFromPage(PROFESSORS[i].getWebPageUrl())), pQuery);
 		}
 		
 		// Check to see if the there are any matches at all
@@ -198,7 +198,7 @@ public class Assignment1
 		boolean noMatch = true;
 		
 		for (int i = 0; i < PROFESSORS.length; i++) {
-			currentPage = obtainWordsFromPage(PROFESSORS[i].getWebPageUrl());
+			currentPage = removeStopWords(obtainWordsFromPage(PROFESSORS[i].getWebPageUrl()));
 			relHits[i] = ((double)numberOfHits(currentPage, pQuery))/((double)currentPage.length);
 		}
 		

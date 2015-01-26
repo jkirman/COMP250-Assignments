@@ -10,6 +10,7 @@
  * 22/01/15 1220: Added more comments.
  * 22/01/15 1306: Fixed the findMaxDouble method.
  * 22/01/15 1352: Further fixed the findMaxDouble method.
+ * 26/01/15: Fixed the removeStopWords method.
  */
 
 package assignment1;
@@ -326,25 +327,50 @@ public class Assignment1
 	{
 		assert pKeyWords != null;
 		
-		// Copies all strings in the pKeyWords array into a new temporary array omitting the stop words
-		String[] temp = new String[pKeyWords.length];
+		// Copies all strings in the pKeyWords array into a new temporary array
+		String[] temp = Arrays.copyOf(pKeyWords, pKeyWords.length);
+		String[] result = new String[pKeyWords.length];
 		int count = 0;
-		int notStopWord = 0;
-		for (int i = 0; i < pKeyWords.length; i++) {
-			for (int j = 0; j < STOP_WORDS.length; j++) {
-				if (!pKeyWords[i].equals(STOP_WORDS[j])) {
-					notStopWord++;
+		int index;
+		
+		// Does a binary search for each stop word and if the stop word exists in the array of strings
+		// the corresponding indices for the stop words are replaced with null
+		for (int i = 0; i < STOP_WORDS.length; i++) {
+			index = Arrays.binarySearch(pKeyWords, STOP_WORDS[i]);
+			if (index > 0) {
+				
+				for (int j = index; j < pKeyWords.length; j++) {
+					if (pKeyWords[index].equals(pKeyWords[j])) {
+						temp[j] = null;
+					}
+					else {
+						break;
+					}
 				}
+				
+				for (int j = index; j > 0; j--) {
+					if (pKeyWords[index].equals(pKeyWords[j])) {
+						temp[j] = null;
+					}
+					else {
+						break;
+					}
+				}
+				
 			}
-			if (notStopWord == STOP_WORDS.length) {
-				temp[count] = pKeyWords[i];
-				count++;
-			}
-			notStopWord = 0;
+			
 		}
 		
-		// returns a truncated copy of the result array (omitting null indices)
-		return Arrays.copyOf(temp,count);
+		// Copy the results all Strings that aren't stop words into a new array
+		for (int i = 0; i < pKeyWords.length; i++) {
+			if (temp[i] != null) {
+				result[count] = temp[i];
+				count++;
+			}
+		}
+		
+		// Returns a truncated copy of the result array (omitting null indices)
+		return Arrays.copyOf(result,count);
 	}
 	
 	/**

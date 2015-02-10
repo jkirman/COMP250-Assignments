@@ -5,6 +5,14 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import assignment2.Patient.Insurance;
 
+/*
+ * Assignment 2
+ * Jeffrey Kirman (260493368) (Group 157)
+ * 
+ * LOG
+ * 10/02/2015: Completed Doctor, Visit, sortDoctors (using bubblesort) classes
+ */
+
 /* ACADEMIC INTEGRITY STATEMENT
  * 
  * By submitting this file, we state that all group members associated
@@ -99,7 +107,25 @@ public class EMR
 	 * based on their ID 
 	 */
 	private void sortDoctors(ArrayList<Doctor> docs){
-		//TODO: Fill code here
+		
+		boolean sorted = false;
+		Doctor DocLeft;
+		Doctor DocRight;
+		
+		while(!sorted) {
+			sorted = true;
+			if (docs.size() > 1) {
+				for (int i = 0; i < docs.size() - 1; i++) {
+					DocLeft = docs.get(i);
+					DocRight = docs.get(i+1);
+					if (DocLeft.getID() > DocRight.getID()) {
+						docs.set(i, DocRight);
+						docs.set(i+1, DocLeft);
+						sorted = false;
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -435,37 +461,39 @@ class Patient
 	ArrayList<Visit> aVisitList;
 	
 	public Patient(String pFirstName, String pLastName, double pHeight, String pGender, Insurance pInsurance,
-			Long pHostpitalID, String pDateOfBirth)
+			Long pHospitalID, String pDateOfBirth)
 	{
-		//TODO: Fill code here
+		aFirstName = pFirstName;
+		aLastName = pLastName;
+		aHeight = pHeight;
+		aGender = pGender;
+		aInsurance = pInsurance;
+		aHospitalID = pHospitalID;
+		aDateOfBirth = pDateOfBirth;
 	}
 	
 	public String getFirstName()
 	{
-		//TODO: Fill code here
-		return null;
+		return aFirstName;
 	}
 	
 	public String getLastName()
 	{
-		//TODO: Fill code here
-		return null;
+		return aLastName;
 	}
 
 	public String getHospitalID()
 	{
-		//TODO: Fill code here
-		return null;
+		return aHospitalID.toString(); //Really needed as a String here?
 	}
 
 	public String getDateOfBirth()
 	{
-		//TODO: Fill code here
-		return null;
+		return aDateOfBirth;
 	}
 
 	public void addVisit(String vDate, Doctor vDoctor){
-		//TODO: Fill code here
+		aVisitList.add(new Visit(vDoctor, this, vDate, "")); // Note???
 	}
 	
 	public void setFirstName(String fname){
@@ -510,29 +538,28 @@ class Doctor
 	
 	public Doctor(String pFirstName, String pLastName, String pSpecialty, Long ID)
 	{
-		//TODO: Fill code here
+		aFirstName = pFirstName;
+		aLastName = pLastName;
+		aSpecialty = pSpecialty;
+		aID = ID;
 	}
 	
 	public String getFirstName()
 	{
-		//TODO: Fill code here
 		return aFirstName;
 	}
 	
 	public String getLastName()
 	{
-		//TODO: Fill code here
-		return null;
+		return aLastName;
 	}
 
 	public String getSpecialty(){
-		//TODO: Fill code here
-		return null;
+		return aSpecialty;
 	}
 
 	public Long getID(){
-		//TODO: Fill code here
-		return null;
+		return aID;
 	}
 	
 	/**
@@ -558,29 +585,28 @@ class Visit
 	
 	public Visit(Doctor vDoctor, Patient vPatient, String vDate, String vNote)
 	{
-		//TODO: Fill code here
+		aDoctor = vDoctor;
+		aPatient = vPatient;
+		aDate = vDate;
+		anote = vNote;
 	}
 	
 	public Doctor getDoctor()
 	{
-		//TODO: Fill code here
-		return null;
+		return aDoctor;
 	}
 	
 	public Patient getPatient()
 	{
-		//TODO: Fill code here
-		return null;
+		return aPatient;
 	}
 
 	public String getDate(){
-		//TODO: Fill code here
-		return null;
+		return aDate;
 	}
 	
 	public String getNote(){
-		//TODO: Fill code here
-		return null;
+		return anote;
 	}
 
 

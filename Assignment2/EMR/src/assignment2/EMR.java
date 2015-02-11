@@ -1,6 +1,8 @@
 package assignment2;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import assignment2.Patient.Insurance;
@@ -78,7 +80,7 @@ public class EMR
 	 */
 	public static void main(String[] args) throws IOException
 	{
-		EMR system = new EMR("filepath1", "filepath2", "filepath3");
+		EMR system = new EMR("Data/Doctors.csv", "Data/Patients.csv", "Data/Patients.csv");
 		system.displayMenu();
 	}
 	
@@ -114,6 +116,13 @@ public class EMR
 		
 		while(!sorted) {
 			sorted = true;
+			
+			// If ArrayList is null break out of the loop
+			if (docs == null) {
+				break;
+			}
+			
+			// Bubblesort the elements of the Arraylist
 			if (docs.size() > 1) {
 				for (int i = 0; i < docs.size() - 1; i++) {
 					DocLeft = docs.get(i);
@@ -140,8 +149,33 @@ public class EMR
 	 * This method adds takes in the path of the Doctor sheet csv file and imports
 	 * all doctors data into the doctorList ArrayList
 	 */
-	private ArrayList<Doctor> importDoctorsInfo(String doctorFilePath){
-		//TODO: Fill code here
+	private ArrayList<Doctor> importDoctorsInfo(String doctorFilePath) {
+		
+		String fName;
+		String lName;
+		String specialty;
+		String id;
+		
+		doctorList = new ArrayList<Doctor>();
+		
+		try {
+			Scanner reader = new Scanner(new File(doctorFilePath));
+				
+			reader.useDelimiter(",|\r\n");
+			
+			for (int i = 0; i < 4; i++) {
+				reader.next();
+			}
+			while (reader.hasNext()) {
+				fName = reader.next();
+				lName = reader.next();
+				specialty = reader.next();
+				id = reader.next();
+				doctorList.add(new Doctor(fName, lName, specialty, Long.parseLong(id)));
+			}
+			reader.close();
+		}
+		catch(FileNotFoundException a) {}
 		return null;
 	}
 	
@@ -150,7 +184,49 @@ public class EMR
 	 * all Patient data into the patientList ArrayList
 	 */
 	private ArrayList<Patient> importPatientInfo(String patientFilePath){
-		//TODO: Fill code here
+
+		String fName;
+		String lName;
+		String height;
+		String insuranceS;
+		String gender;
+		String hID;
+		String DoB;
+		Patient.Insurance insurance;
+		
+		patientList = new ArrayList<Patient>();
+		
+		try {
+			Scanner reader = new Scanner(new File(patientFilePath));
+			reader.useDelimiter(",|\r\n");
+			
+			for (int i = 0; i < 7; i++) {
+				reader.next();
+			}
+			while (reader.hasNext()) {
+				fName = reader.next();
+				lName = reader.next();
+				height = reader.next();
+				insuranceS = reader.next();
+				gender = reader.next();
+				hID = reader.next();
+				DoB = reader.next();
+				
+				if (insuranceS.equals("RAMQ")) {
+					insurance = Patient.Insurance.RAMQ;
+				}
+				else if (insuranceS.equals("Private")) {
+					insurance = Patient.Insurance.Private;
+				}
+				else {
+					insurance = Patient.Insurance.NONE;
+				}
+				
+				patientList.add(new Patient(fName, lName, Double.parseDouble(height), gender, insurance, Long.parseLong(hID), DoB));
+			}
+			reader.close();
+		}
+		catch(FileNotFoundException a) {}
 		return null;
 	}
 	

@@ -12,7 +12,8 @@ import assignment2.Patient.Insurance;
  * Jeffrey Kirman (260493368) (Group 157)
  * 
  * LOG
- * 10/02/2015: Completed Doctor, Visit, sortDoctors (using bubblesort) classes
+ * 10/02/2015: Completed Doctor, Visit, sortDoctors (using bubblesort) classes.
+ * 10/02/2015: Attempted importing classes.
  */
 
 /* ACADEMIC INTEGRITY STATEMENT
@@ -102,6 +103,7 @@ public class EMR
 		
 		sortDoctors(this.doctorList);
 		sortPatients(this.patientList);
+		
 	}
 
 	/**

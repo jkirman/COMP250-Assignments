@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 import assignment2.Patient.Insurance;
 
 /*
@@ -14,6 +15,7 @@ import assignment2.Patient.Insurance;
  * LOG
  * 10/02/2015: Completed Doctor, Visit, sortDoctors (using bubblesort) classes.
  * 10/02/2015: Attempted importing classes.
+ * 14/02/2015: Finished options 1 and 2, sortPatients (using merge sort).
  */
 
 /* ACADEMIC INTEGRITY STATEMENT
@@ -144,7 +146,7 @@ public class EMR
 	 * patients based on the hospitalID
 	 */
 	private void sortPatients(ArrayList<Patient> patients){
-		//TODO: Fill code here
+		patients = mergeSortPatient(patients);
 	}
 	
 	/**
@@ -175,7 +177,6 @@ public class EMR
 				id = reader.next();
 				doctorList.add(new Doctor(fName, lName, specialty, Long.parseLong(id)));
 			}
-			reader.close();
 		}
 		catch(FileNotFoundException a) {}
 		return null;
@@ -226,7 +227,6 @@ public class EMR
 				
 				patientList.add(new Patient(fName, lName, Double.parseDouble(height), gender, insurance, Long.parseLong(hID), DoB));
 			}
-			reader.close();
 		}
 		catch(FileNotFoundException a) {}
 		return null;
@@ -237,8 +237,44 @@ public class EMR
 	 * every Visit data. It appends Visit objects to their respective Patient
 	 */
 	private void importVisitData(String visitsFilePath){
-		//TODO: Fill code here
+		
+		String hID;
+		String dID;
+		String date;
+		String note;
+		
+		ArrayList<Visit> allVisits = new ArrayList<>();
+		
+		try {
+			Scanner reader = new Scanner(new File(visitsFilePath));
+				
+			reader.useDelimiter(",|\r\n");
+			
+			for (int i = 0; i < 4; i++) {
+				reader.next();
+			}
+			while (reader.hasNext()) {
+				hID = reader.next();
+				dID = reader.next();
+				date = reader.next();
+				note = reader.next();
+				
+				for (int i = 0; i < patientList.size(); i++) {
+					if (patientList.get(i).getHospitalID().equals(hID)) {
+//						patientList.get(i).aVisitList.add(new Visit(patientList.get(i)., patientList.get(i), date, note));
+						break;
+					}
+				}
+				
+//				allVisits.add(new Doctor(fName, lName, specialty, Long.parseLong(id)));
+			}
+		}
+		catch(FileNotFoundException a) {}
+
 	}
+		
+		
+		//TODO: Fill code here
 	
 	/**
 	 * This method uses an infinite loop to simulate the interface of the EMR system.
@@ -315,6 +351,7 @@ public class EMR
 					break;
 			}
 		}
+		scan.close();
 	}
 	
 	/**
@@ -324,14 +361,104 @@ public class EMR
 	 * to the addPatient method
 	 */
 	private void option1(){
-		//TODO: Fill code here. Ask the user to supply by command-line values for all the variables below.
+
 		String firstname = null;
 		String lastname = null;
 		double height = 0;
 		String Gender = null;
-		Insurance type = null;
+		Patient.Insurance type = null;
 		Long hospitalID = null;
 		String DOB = null;
+		Scanner scan = new Scanner(System.in);
+		
+		System.out.println("What is the patient's hospital ID (only decimal digits)?");
+		String hID = null;
+		boolean enteredHID = false;
+			while (!enteredHID) {
+			try {
+				while (hID == null) {
+					hID = scan.nextLine();
+					hospitalID = Long.parseLong(hID);
+					enteredHID = true;
+				}
+			}
+			catch (NumberFormatException e) {
+				System.out.println("Invalid number entered, please reenter the hospital ID.");
+				hID = null;
+				enteredHID = false;
+			}
+		}
+
+		System.out.println("What is the patient's last name?");
+		while (lastname == null) {
+			lastname = scan.nextLine();
+		}
+		
+		System.out.println("What is the patient's first name?");
+		while (firstname == null) {
+			firstname = scan.nextLine();
+		}
+		
+		System.out.println("What is the patient's height (in cm)?");
+		String hgt = null;
+		boolean enteredHeight = false;
+			while (!enteredHeight) {
+			try {
+				while (hgt == null) {
+					hgt = scan.nextLine();
+					height = Double.parseDouble(hgt);
+					enteredHeight = true;
+				}
+			}
+			catch (NumberFormatException e) {
+				System.out.println("Invalid number entered, please reenter the height (in cm).");
+				hgt = null;
+				enteredHeight = false;
+			}
+		}
+			
+		System.out.println("What is the patient's gender?");
+		while (Gender == null) {
+			Gender = scan.nextLine();
+		}
+		
+		System.out.println("What is the patient's date of birth (mm-dd-yyyy)?");
+		while (DOB == null) {
+			DOB = scan.nextLine();
+		}
+		
+		System.out.println("What is the patient's insurance type?");
+		System.out.println("Please select one of the following options and click enter:");
+		System.out.println("1. RAMQ\n" + "2. Private\n" + "3. None");
+		
+		int choice = 0;
+		String c = null;
+	
+		while ((choice != 1 && choice !=2 && choice !=3) || c == null) {
+			
+			try{
+				c = scan.nextLine();
+				choice = Integer.parseInt(c);
+			}
+			catch(Exception e){
+				c = null;
+				choice = 0;
+			}
+			switch(choice) {
+			case 1:
+				type = Patient.Insurance.RAMQ;
+				break;
+			case 2:
+				type = Patient.Insurance.Private;
+				break;
+			case 3:
+				type = Patient.Insurance.NONE;
+				break;
+			default:
+				System.out.println("Invalid number entered, please reenter.");
+				break;
+			}
+		}
 		
 		addPatient(firstname, lastname, height, Gender, type, hospitalID, DOB);
 	}
@@ -339,8 +466,8 @@ public class EMR
 	/**
 	 * This method adds a patient object to the end of the patientList ArrayList. 
 	 */
-	private void addPatient(String firstname, String lastname, double height, String Gender, Insurance type, Long hospitalID, String DOB){
-		//TODO: Fill code here
+	private void addPatient(String firstname, String lastname, double height, String Gender, Patient.Insurance type, Long hospitalID, String DOB){
+		patientList.add(new Patient(firstname, lastname, height, Gender, type, hospitalID, DOB));
 		return;
 	}
 	
@@ -356,6 +483,41 @@ public class EMR
 		String lastname = null;
 		String specialty = null;
 		Long doctor_id = null;
+		
+		Scanner scan = new Scanner(System.in);
+		
+		System.out.println("What is the doctor's last name?");
+		while (lastname == null) {
+			lastname = scan.nextLine();
+		}
+		
+		System.out.println("What is the doctor's first name?");
+		while (firstname == null) {
+			firstname = scan.nextLine();
+		}
+		
+		System.out.println("What is the doctor's specialty?");
+		while (specialty == null) {
+			specialty = scan.nextLine();
+		}
+		
+		System.out.println("What is the doctor's ID (only decimal digits)?");
+		String ID = null;
+		boolean enteredID = false;
+			while (!enteredID) {
+			try {
+				while (ID == null) {
+					ID = scan.nextLine();
+					doctor_id = Long.parseLong(ID);
+					enteredID = true;
+				}
+			}
+			catch (NumberFormatException e) {
+				System.out.println("Invalid number entered, please reenter the hospital ID.");
+				ID = null;
+				enteredID = false;
+			}
+		}
 		
 		addDoctor(firstname, lastname, specialty, doctor_id);
 	}
@@ -403,15 +565,16 @@ public class EMR
 		double newHeight = 0;
 		Insurance newType = null;
 		String newDOB = null;
+		Long ID = null;
 		
-		editPatient(newFirstname, newLastname, newHeight, newType, newDOB);
+		editPatient(newFirstname, newLastname, newHeight, newType, newDOB, ID);
 	}
 	
 	/**
 	 * This method edits a Patient record. Only the firstname, lastname, height, 
 	 * Insurance type, address could be changed, and date of birth. 
 	 */
-	private void editPatient(String firstname, String lastname, double height, Insurance type, String DOB){
+	private void editPatient(String firstname, String lastname, double height, Insurance type, String DOB, Long ID){
 		//TODO: Fill code here
 	}
 	
@@ -487,7 +650,27 @@ public class EMR
 	 * @return
 	 */
 	private Doctor findDoctor(Long id){
-		//TODO: Fill code here
+		
+		int iterator;
+		
+		if (doctorList == null) {
+			return null;
+		}
+		
+		iterator = doctorList.size()/2;
+		
+		while ((iterator > 0) && (iterator < doctorList.size())) {
+			if (doctorList.get(iterator).getID() == id) {
+				return doctorList.get(iterator);
+			}
+			else if (id < doctorList.get(iterator).getID()) {
+				iterator = iterator/2;
+			}
+			else {
+				iterator = iterator + (iterator + 1)/2;
+			}
+		}
+		
 		return null;
 	}
 	
@@ -516,7 +699,133 @@ public class EMR
 	private void exitAndSave(){
 		//TODO: Fill code here
 	}
+	
+	private static ArrayList<Patient> mergeSortPatient(ArrayList<Patient> patients) {
+		
+		// For when the list of patients is 1 or less, it is already sorted so it can be returned as is
+		if (patients.size() <= 1) {
+			return patients;
+		}
+		
+		// Initiate variables for left and right lists for the merge sort
+		ArrayList<Patient> left = new ArrayList<>();
+		ArrayList<Patient> right = new ArrayList<>();
+		
+		// Split the patients list into two
+		for (int i = 0; i < patients.size()/2; i++) {
+			left.add(patients.get(i));
+		}
+		
+		for (int i = patients.size()/2; i < patients.size(); i++) {
+			right.add(patients.get(i));
+		}
+		
+		left = mergeSortPatient(left);
+		right = mergeSortPatient(right);
+		patients = mergePatient(left, right);
+		
+		return patients;
+		
+	}
+	
+	private static ArrayList<Patient> mergePatient(ArrayList<Patient> left, ArrayList<Patient> right) {
+		
+		ArrayList<Patient> out = new ArrayList<>();
+		Long leftID;
+		Long rightID;
+		int lefti = 0;
+		int righti = 0;
+		
+		for (int i = 0; i < left.size() + right.size(); i++) {
+				
+			if (lefti >= left.size()) {
+				out.add(right.get(righti));
+				righti++;
+			}
+			else if (righti >= right.size()) {
+				out.add(left.get(lefti));
+				lefti++;
+			}
+			else {
+				leftID = Long.parseLong(left.get(lefti).getHospitalID());
+				rightID = Long.parseLong(right.get(righti).getHospitalID());	
+				if (leftID <= rightID) {
+					out.add(left.get(lefti));
+					lefti++;
+				}
+				else {
+					out.add(right.get(righti));
+					righti++;
+				}
+			}
+			
+		}
 
+		return out;
+	}
+	
+	/*
+	private static ArrayList<Patient> mergeSortPatient(ArrayList<Patient> patients) {
+		
+		// For when the list of patients is 1 or less, it is already sorted so it can be returned as is
+		if (patients.size() <= 1) {
+			return patients;
+		}
+		
+		// Initiate variables for left and right lists for the merge sort
+		ArrayList<Patient> left = new ArrayList<>();
+		ArrayList<Patient> right = new ArrayList<>();
+		
+		// Split the patients list into two
+		for (int i = 0; i < patients.size()/2; i++) {
+			left.add(patients.get(i));
+		}
+		
+		for (int i = patients.size()/2; i < patients.size(); i++) {
+			right.add(patients.get(i));
+		}
+		
+		mergeSortPatient(left);
+		mergeSortPatient(right);
+		patients = mergePatient(left, right);
+		
+		return patients;
+		
+	}
+	
+	private static ArrayList<Patient> mergePatient(ArrayList<Patient> left, ArrayList<Patient> right) {
+		
+		ArrayList<Patient> out = new ArrayList<>();
+		Long leftID;
+		Long rightID;
+		int i = 0;
+		int j = 0;
+		
+		while (i < left.size()) {
+			while (j < right.size()) {
+				
+				leftID = Long.parseLong(left.get(i).getHospitalID());
+				rightID = Long.parseLong(right.get(j).getHospitalID());	
+				
+				if (leftID <= rightID) {
+					out.add(left.get(i));
+					i++;
+				}
+				else {
+					out.add(right.get(j));
+					j++;
+				}
+				
+			}
+		}
+		
+		while (j < right.size()) {
+			out.add(right.get(j));
+			j++;
+		}
+		
+		return out;
+	} */
 	
 }
 
@@ -562,7 +871,7 @@ class Patient
 
 	public String getHospitalID()
 	{
-		return aHospitalID.toString(); //Really needed as a String here?
+		return aHospitalID.toString();
 	}
 
 	public String getDateOfBirth()
@@ -598,8 +907,16 @@ class Patient
 	 * This method should print all the Patient's info. "ID, Lastname, Firstname, etc..."
 	 */
 	public String toString(){
-		//TODO: Fill code here
-		return null;
+		
+		String output = this.getHospitalID() + ", " +
+				this.getLastName() + ", " +
+				this.getFirstName() + ", " +
+				this.aGender + ", " +
+				this.aHeight + ", " +
+				this.getDateOfBirth() + ", " +
+				this.aInsurance;
+		return output;
+		
 	}
 }
 
@@ -644,8 +961,13 @@ class Doctor
 	 * This method should print all the Doctor's info. "ID, Lastname, Firstname, Specialty"
 	 */
 	public String toString(){
-		//TODO: Fill code here
-		return null;
+		
+		String output = this.getID() + ", " +
+				this.getLastName() + ", " +
+				this.getFirstName() + ", " +
+				this.getSpecialty();
+		return output;
+		
 	}
 
 }

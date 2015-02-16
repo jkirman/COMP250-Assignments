@@ -17,6 +17,7 @@ import assignment2.Patient.Insurance;
  * 10/02/2015: Attempted importing classes.
  * 14/02/2015: Finished options 1 and 2, sortPatients (using merge sort).
  * 15/02/2015: Finished options 3 to 5 and associated methods. Problem with reading files.
+ * 16/02/2015: Finished option 6. Fixed file reading issue. Various bug fixes.
  */
 
 /* ACADEMIC INTEGRITY STATEMENT
@@ -84,7 +85,7 @@ public class EMR
 	 */
 	public static void main(String[] args) throws IOException
 	{
-		EMR system = new EMR("Data/Doctors.csv", "Data/Patients.csv", "Data/Visits.csv");
+		EMR system = new EMR("../Data/Doctors.csv", "../Data/Patients.csv", "../Data/Visits.csv");
 		system.displayMenu();
 	}
 	
@@ -102,10 +103,11 @@ public class EMR
 		
 		importDoctorsInfo(this.aDoctorFilePath);
 		importPatientInfo(this.aPatientFilePath);
-		importVisitData(this.aVisitsFilePath);
 		
 		sortDoctors(this.doctorList);
-		sortPatients(this.patientList);
+		this.patientList = sortPatients(this.patientList);
+		
+		importVisitData(this.aVisitsFilePath);
 		
 	}
 
@@ -146,8 +148,79 @@ public class EMR
 	 * This method should sort the patientList in time O(n log n). It should sort the 
 	 * patients based on the hospitalID
 	 */
-	private void sortPatients(ArrayList<Patient> patients){
-		patients = mergeSortPatient(patients);
+	private ArrayList<Patient> sortPatients(ArrayList<Patient> patients){ // Ask if this is ok
+		
+		ArrayList<Patient> out = new ArrayList<>();
+		
+		out = mergeSortPatient(patients);
+		
+		return out;
+	}
+	
+	private static ArrayList<Patient> mergeSortPatient(ArrayList<Patient> patients) {
+		
+		ArrayList<Patient> out = new ArrayList<>();
+		
+		// For when the list of patients is 1 or less, it is already sorted so it can be returned as is
+		if (patients.size() <= 1) {
+			return patients;
+		}
+		
+		// Initiate variables for left and right lists for the merge sort
+		ArrayList<Patient> left = new ArrayList<>();
+		ArrayList<Patient> right = new ArrayList<>();
+		
+		// Split the patients list into two
+		for (int i = 0; i < patients.size()/2; i++) {
+			left.add(patients.get(i));
+		}
+		
+		for (int i = patients.size()/2; i < patients.size(); i++) {
+			right.add(patients.get(i));
+		}
+		
+		left = mergeSortPatient(left);
+		right = mergeSortPatient(right);
+		out = mergePatient(left, right);
+		
+		return out;
+		
+	}
+	
+	private static ArrayList<Patient> mergePatient(ArrayList<Patient> left, ArrayList<Patient> right) {
+		
+		ArrayList<Patient> out = new ArrayList<>();
+		Long leftID;
+		Long rightID;
+		int lefti = 0;
+		int righti = 0;
+		
+		for (int i = 0; i < left.size() + right.size(); i++) {
+				
+			if (lefti >= left.size()) {
+				out.add(right.get(righti));
+				righti++;
+			}
+			else if (righti >= right.size()) {
+				out.add(left.get(lefti));
+				lefti++;
+			}
+			else {
+				leftID = Long.parseLong(left.get(lefti).getHospitalID());
+				rightID = Long.parseLong(right.get(righti).getHospitalID());	
+				if (leftID <= rightID) {
+					out.add(left.get(lefti));
+					lefti++;
+				}
+				else {
+					out.add(right.get(righti));
+					righti++;
+				}
+			}
+			
+		}
+
+		return out;
 	}
 	
 	/**
@@ -164,10 +237,7 @@ public class EMR
 		doctorList = new ArrayList<Doctor>();
 		
 		try {
-			File test = new File(doctorFilePath);
-			System.out.println(test.isFile());
-			System.out.println(test.getAbsolutePath());
-			System.out.println(test.canRead());
+
 			Scanner reader = new Scanner(new File(doctorFilePath));
 				
 			reader.useDelimiter(",|\r\n");
@@ -183,7 +253,8 @@ public class EMR
 				doctorList.add(new Doctor(fName, lName, specialty, Long.parseLong(id)));
 			}
 		}
-		catch(FileNotFoundException a) {}
+		catch(FileNotFoundException a) {
+		}
 		return null;
 	}
 	
@@ -247,8 +318,6 @@ public class EMR
 		String dID;
 		String date;
 		String note;
-		
-		ArrayList<Visit> allVisits = new ArrayList<>();
 		
 		try {
 			Scanner reader = new Scanner(new File(visitsFilePath));
@@ -784,16 +853,17 @@ public class EMR
 	 */
 	private void displayPatients(ArrayList<Patient> patients){
 		//TODO: Fill code here. Loop through all patients and call toString method
-		System.out.println("Hospital ID" + ", " +
-				"Last Name" + ", " +
-				"First Name" + ", " +
-				"Gender" + ", " +
-				"Height" + ", " +
-				"Date Of Birth" + ", " +
+		System.out.println("Hospital ID" + ",\t" +
+				"Last Name" + ",\t" +
+				"First Name" + ",\t" +
+				"Gender" + ",\t" +
+				"Height" + ",\t" +
+				"Date Of Birth" + ",\t" +
 				"Insurance");
 		for (int i = 0; i < patients.size(); i++) {
 			System.out.println(patients.get(i).toString());
 		}
+		System.out.println();
 	}
 	
 	/**
@@ -810,7 +880,14 @@ public class EMR
 	 * one Doctor at a time by calling the Doctor toString() method
 	 */
 	private void displayDoctors(ArrayList<Doctor> docs){
-		//TODO: Fill code here
+		System.out.println("ID" + ",\t" +
+				"Last Name" + ",\t" +
+				"First Name" + ",\t" +
+				"Specialty");
+		for (int i = 0; i < docs.size(); i++) {
+			System.out.println(docs.get(i).toString());
+		}
+		System.out.println();
 	}
 
 	
@@ -853,6 +930,7 @@ public class EMR
 	private Doctor findDoctor(Long id){
 		
 		int iterator;
+		int action;
 		
 		if (doctorList == null) {
 			return null;
@@ -860,11 +938,14 @@ public class EMR
 		
 		iterator = doctorList.size()/2;
 		
-		while ((iterator > 0) && (iterator < doctorList.size())) {
-			if (doctorList.get(iterator).getID() == id) {
+		while ((iterator >= 0) && (iterator < doctorList.size())) {
+			
+			action = id.compareTo(doctorList.get(iterator).getID());
+			
+			if (action == 0) {
 				return doctorList.get(iterator);
 			}
-			else if (id < doctorList.get(iterator).getID()) {
+			else if (action < 0) {
 				iterator = iterator/2;
 			}
 			else {
@@ -901,133 +982,6 @@ public class EMR
 		//TODO: Fill code here
 	}
 	
-	private static ArrayList<Patient> mergeSortPatient(ArrayList<Patient> patients) {
-		
-		// For when the list of patients is 1 or less, it is already sorted so it can be returned as is
-		if (patients.size() <= 1) {
-			return patients;
-		}
-		
-		// Initiate variables for left and right lists for the merge sort
-		ArrayList<Patient> left = new ArrayList<>();
-		ArrayList<Patient> right = new ArrayList<>();
-		
-		// Split the patients list into two
-		for (int i = 0; i < patients.size()/2; i++) {
-			left.add(patients.get(i));
-		}
-		
-		for (int i = patients.size()/2; i < patients.size(); i++) {
-			right.add(patients.get(i));
-		}
-		
-		left = mergeSortPatient(left);
-		right = mergeSortPatient(right);
-		patients = mergePatient(left, right);
-		
-		return patients;
-		
-	}
-	
-	private static ArrayList<Patient> mergePatient(ArrayList<Patient> left, ArrayList<Patient> right) {
-		
-		ArrayList<Patient> out = new ArrayList<>();
-		Long leftID;
-		Long rightID;
-		int lefti = 0;
-		int righti = 0;
-		
-		for (int i = 0; i < left.size() + right.size(); i++) {
-				
-			if (lefti >= left.size()) {
-				out.add(right.get(righti));
-				righti++;
-			}
-			else if (righti >= right.size()) {
-				out.add(left.get(lefti));
-				lefti++;
-			}
-			else {
-				leftID = Long.parseLong(left.get(lefti).getHospitalID());
-				rightID = Long.parseLong(right.get(righti).getHospitalID());	
-				if (leftID <= rightID) {
-					out.add(left.get(lefti));
-					lefti++;
-				}
-				else {
-					out.add(right.get(righti));
-					righti++;
-				}
-			}
-			
-		}
-
-		return out;
-	}
-	
-	/*
-	private static ArrayList<Patient> mergeSortPatient(ArrayList<Patient> patients) {
-		
-		// For when the list of patients is 1 or less, it is already sorted so it can be returned as is
-		if (patients.size() <= 1) {
-			return patients;
-		}
-		
-		// Initiate variables for left and right lists for the merge sort
-		ArrayList<Patient> left = new ArrayList<>();
-		ArrayList<Patient> right = new ArrayList<>();
-		
-		// Split the patients list into two
-		for (int i = 0; i < patients.size()/2; i++) {
-			left.add(patients.get(i));
-		}
-		
-		for (int i = patients.size()/2; i < patients.size(); i++) {
-			right.add(patients.get(i));
-		}
-		
-		mergeSortPatient(left);
-		mergeSortPatient(right);
-		patients = mergePatient(left, right);
-		
-		return patients;
-		
-	}
-	
-	private static ArrayList<Patient> mergePatient(ArrayList<Patient> left, ArrayList<Patient> right) {
-		
-		ArrayList<Patient> out = new ArrayList<>();
-		Long leftID;
-		Long rightID;
-		int i = 0;
-		int j = 0;
-		
-		while (i < left.size()) {
-			while (j < right.size()) {
-				
-				leftID = Long.parseLong(left.get(i).getHospitalID());
-				rightID = Long.parseLong(right.get(j).getHospitalID());	
-				
-				if (leftID <= rightID) {
-					out.add(left.get(i));
-					i++;
-				}
-				else {
-					out.add(right.get(j));
-					j++;
-				}
-				
-			}
-		}
-		
-		while (j < right.size()) {
-			out.add(right.get(j));
-			j++;
-		}
-		
-		return out;
-	} */
-	
 }
 
 /**
@@ -1058,6 +1012,8 @@ class Patient
 		aInsurance = pInsurance;
 		aHospitalID = pHospitalID;
 		aDateOfBirth = pDateOfBirth;
+		
+		aVisitList = new ArrayList<>();
 	}
 	
 	public String getFirstName()
@@ -1109,12 +1065,12 @@ class Patient
 	 */
 	public String toString(){
 		
-		String output = this.getHospitalID() + ", " +
-				this.getLastName() + ", " +
-				this.getFirstName() + ", " +
-				this.aGender + ", " +
-				this.aHeight + ", " +
-				this.getDateOfBirth() + ", " +
+		String output = this.getHospitalID() + ",\t" +
+				this.getLastName() + ",\t" +
+				this.getFirstName() + ",\t" +
+				this.aGender + ",\t" +
+				this.aHeight + ",\t" +
+				this.getDateOfBirth() + ",\t" +
 				this.aInsurance;
 		return output;
 		
@@ -1163,9 +1119,9 @@ class Doctor
 	 */
 	public String toString(){
 		
-		String output = this.getID() + ", " +
-				this.getLastName() + ", " +
-				this.getFirstName() + ", " +
+		String output = this.getID() + ",\t" +
+				this.getLastName() + ",\t" +
+				this.getFirstName() + ",\t" +
 				this.getSpecialty();
 		return output;
 		

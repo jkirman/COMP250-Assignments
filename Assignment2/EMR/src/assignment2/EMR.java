@@ -18,6 +18,7 @@ import assignment2.Patient.Insurance;
  * 14/02/2015: Finished options 1 and 2, sortPatients (using merge sort).
  * 15/02/2015: Finished options 3 to 5 and associated methods. Problem with reading files.
  * 16/02/2015: Finished option 6. Fixed file reading issue. Various bug fixes.
+ * 19/02/2015: Finished option 7.
  */
 
 /* ACADEMIC INTEGRITY STATEMENT
@@ -51,8 +52,8 @@ import assignment2.Patient.Insurance;
  *  	4.	Edit patient information
  *  	5.	Display list of all Patient IDs
  *  	6.	Display list of all Doctor IDs
- *  	7.	Print a Doctor's record
- *  	8.	Print a Patient's record
+ *  	7.	Print a Patient's record
+ *  	8.	Print a Doctor's record
  *  	9.	Exit and save modifications
  * 	
  *	Complete the code provided as part of the assignment package. Fill in the \\TODO sections
@@ -105,7 +106,7 @@ public class EMR
 		importPatientInfo(this.aPatientFilePath);
 		
 		sortDoctors(this.doctorList);
-		this.patientList = sortPatients(this.patientList);
+		sortPatients(this.patientList);
 		
 		importVisitData(this.aVisitsFilePath);
 		
@@ -148,13 +149,15 @@ public class EMR
 	 * This method should sort the patientList in time O(n log n). It should sort the 
 	 * patients based on the hospitalID
 	 */
-	private ArrayList<Patient> sortPatients(ArrayList<Patient> patients){ // Ask if this is ok
+	private void sortPatients(ArrayList<Patient> patients){
 		
 		ArrayList<Patient> out = new ArrayList<>();
 		
 		out = mergeSortPatient(patients);
 		
-		return out;
+		patients.clear();
+		patients.addAll(out);
+		
 	}
 	
 	private static ArrayList<Patient> mergeSortPatient(ArrayList<Patient> patients) {
@@ -375,8 +378,8 @@ public class EMR
 								"   (4) Edit patient information\n" +
 								"   (5) Display list of all Patient IDs\n" +
 								"   (6) Display list of all Doctor IDs\n" +
-								"   (7) Print a Doctor's record\n" +
-								"   (8) Print a Patient's record\n" +
+								"   (7) Print a Patient's record\n" +
+								"   (8) Print a Doctor's record\n" +
 								"   (9) Exit and save modifications\n");
 			System.out.print("   ENTER YOUR SELECTION HERE: ");
 			
@@ -543,7 +546,6 @@ public class EMR
 		return;
 	}
 	
-	
 	/**
 	 * This method adds a doctor to the end of the doctorList ArrayList. It 
 	 * should ask the user to provide all the input to create a Doctor object. The 
@@ -609,7 +611,6 @@ public class EMR
 		Long doctorID = null;
 		Long patientID = null;
 		String date = null;
-		String note = null;
 		
 		//Use above variables to find which Doctor the patient saw
 		Doctor d = null;
@@ -679,20 +680,14 @@ public class EMR
 			date = scan.nextLine();
 		}
 		
-		// Note
-		System.out.println("A note about the visit:");
-		while (note == null) {
-			note = scan.nextLine();
-		}
-		
-		recordPatientVisit(d, p, date, note);
+		recordPatientVisit(d, p, date);
 	}
 	
 	/**
 	 * This method creates a Visit record. It adds the Visit to a Patient object.
 	 */
-	private void recordPatientVisit(Doctor doctor, Patient patient, String date, String note){
-		patient.addVisit(date, doctor, note);
+	private void recordPatientVisit(Doctor doctor, Patient patient, String date){
+		patient.addVisit(date, doctor);
 	}
 	
 	/**
@@ -889,17 +884,35 @@ public class EMR
 		}
 		System.out.println();
 	}
-
 	
 	/**
 	 * This method should ask the user to supply an id of the patient they want info about
 	 */
 	private void option7(){
-		//TODO: ask the user to specify the id of the patient
+		
 		Long patientID = null;
-		
+		Scanner scan = new Scanner(System.in);
+
+		System.out.println("What is the patient's ID (only decimal digits)?");
+		String pID = null;
+		boolean enteredPID = false;
+		while (!enteredPID) {
+			try {
+				while (pID == null) {
+					pID = scan.nextLine();
+					patientID = Long.parseLong(pID);
+					enteredPID = true;
+				}
+			}
+			catch (NumberFormatException e) {
+				System.out.println("Invalid number entered, please reenter the patient's ID.");
+				pID = null;
+				enteredPID = false;
+			}
+		}
+
 		printPatientRecord(patientID);
-		
+
 	}
 	
 	/**
@@ -908,7 +921,105 @@ public class EMR
 	 * every Visit, the doctor's firstname, lastname and id should be printed as well.
 	 */
 	private void printPatientRecord(Long patientID){
-		//TODO: Fill code here
+
+		Patient currentPatient = null;
+		Long currentID;
+		
+		for (int i = 0; i < patientList.size(); i++) {
+			currentID = Long.parseLong(patientList.get(i).getHospitalID());
+			if (currentID.equals(patientID)) {
+				currentPatient = patientList.get(i);
+			}
+		}
+		
+		if (currentPatient == null) {
+			return;
+		}
+		else {
+			
+			System.out.println("Patient:");
+			System.out.println("Hospital ID" + ",\t" +
+					"Last Name" + ",\t" +
+					"First Name" + ",\t" +
+					"Gender" + ",\t" +
+					"Height" + ",\t" +
+					"Date Of Birth" + ",\t" +
+					"Insurance");
+			System.out.println();
+			System.out.println(currentPatient.toString());
+			System.out.println();
+			
+			if (currentPatient.aVisitList == null) {
+				return;
+			}
+			else {
+				sortVisitList(currentPatient);
+				
+				System.out.println("Visits:");
+				System.out.println("Doctor ID" + ",\t" +
+						"Last Name" + ",\t" +
+						"First Name" + ",\t" +
+						"Visit Date" + ",\t" +
+						"Note");
+				for (int i = 0; i < currentPatient.aVisitList.size(); i++) {
+					System.out.println(currentPatient.aVisitList.get(i).toString());
+				}
+				System.out.println();
+			}
+			
+		}
+		
+	}
+
+	/**
+	 * Takes in a string that represents the date and returns a chronological value used for sorting.
+	 * @param date String in format YYYY-MM-DD
+	 * @return a chronological value used for sorting
+	 */
+	private int toDayCount(String date) {
+		
+		int dayCount;
+		
+		int year = Integer.parseInt(date.substring(6, 10));
+		int month = Integer.parseInt(date.substring(0, 2));
+		int day = Integer.parseInt(date.substring(3, 5));
+		
+		dayCount = year*10000 + month*100 + day;
+		
+		return dayCount;
+		
+	}
+	
+	/**
+	 * Sorts the visit list of a patient using bubble sort.
+	 * @param p A Patient whose visit list should be sorted.
+	 */
+	private void sortVisitList(Patient p) {
+		boolean sorted = false;
+		Visit visitLeft;
+		Visit visitRight;
+		
+		while(!sorted) {
+			sorted = true;
+			
+			// If ArrayList is null break out of the loop
+			if (p.aVisitList == null) {
+				break;
+			}
+			
+			// Bubblesort the elements of the Arraylist
+			if (p.aVisitList.size() > 1) {
+				for (int i = 0; i < p.aVisitList.size() - 1; i++) {
+					visitLeft = p.aVisitList.get(i);
+					visitRight = p.aVisitList.get(i+1);
+					if (toDayCount(visitLeft.getDate()) > toDayCount(visitRight.getDate())) {
+						p.aVisitList.set(i, visitRight);
+						p.aVisitList.set(i+1, visitLeft);
+						sorted = false;
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -1036,8 +1147,8 @@ class Patient
 		return aDateOfBirth;
 	}
 
-	public void addVisit(String vDate, Doctor vDoctor, String note){
-		aVisitList.add(new Visit(vDoctor, this, vDate, note));
+	public void addVisit(String vDate, Doctor vDoctor){
+		aVisitList.add(new Visit(vDoctor, this, vDate, ""));
 	}
 	
 	public void setFirstName(String fname){
@@ -1163,8 +1274,19 @@ class Visit
 	}
 	
 	public String getNote(){
+
 		return anote;
 	}
 
+	public String toString() {
+		
+		String output = this.getDoctor().getID() + ",\t" +
+				this.getDoctor().getLastName() + ",\t" +
+				this.getDoctor().getFirstName() + ",\t" +
+				this.getDate() + ",\t" +
+				this.getNote();
+		return output;
+		
+	}
 
 }

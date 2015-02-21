@@ -21,6 +21,7 @@ import assignment2.Patient.Insurance;
  * 16/02/2015: Finished option 6. Fixed file reading issue. Various bug fixes.
  * 19/02/2015: Finished option 7.
  * 20/02/2015: Finished option 8 and 9.
+ * 21/02/2015: Refined comments, enhanced UI and tested code for bugs.
  */
 
 /* ACADEMIC INTEGRITY STATEMENT
@@ -134,9 +135,13 @@ public class EMR
 			
 			// Bubblesort the elements of the Arraylist
 			if (docs.size() > 1) {
+				
+				// Iterate through all adjacent pairs of IDs
 				for (int i = 0; i < docs.size() - 1; i++) {
 					DocLeft = docs.get(i);
 					DocRight = docs.get(i+1);
+					
+					// If the left ID of a pair is greater than the right ID, swap them
 					if (DocLeft.getID() > DocRight.getID()) {
 						docs.set(i, DocRight);
 						docs.set(i+1, DocLeft);
@@ -157,11 +162,17 @@ public class EMR
 		
 		out = mergeSortPatient(patients);
 		
+		// Clear the current patients array and add in all the elements of the sorted array
 		patients.clear();
 		patients.addAll(out);
 		
 	}
 	
+	/**
+	 * Sorts an ArrayList of Patients by their ID using merge sort
+	 * @param patients An ArrayList of Patients
+	 * @return The original ArrayList of patients but sorted
+	 */
 	private static ArrayList<Patient> mergeSortPatient(ArrayList<Patient> patients) {
 		
 		ArrayList<Patient> out = new ArrayList<>();
@@ -184,6 +195,7 @@ public class EMR
 			right.add(patients.get(i));
 		}
 		
+		// Recursively merge sort the patients
 		left = mergeSortPatient(left);
 		right = mergeSortPatient(right);
 		out = mergePatient(left, right);
@@ -192,8 +204,15 @@ public class EMR
 		
 	}
 	
+	/**
+	 * Merges two sorted Patient ArrayLists, sorting them in the process
+	 * @param left A sorted Patient ArrayList
+	 * @param right A sorted Patient ArrayList
+	 * @return An ArrayList that contains all the elements of both the left and right ArrayLists, and is sorted
+	 */
 	private static ArrayList<Patient> mergePatient(ArrayList<Patient> left, ArrayList<Patient> right) {
 		
+		// Initialized variables
 		ArrayList<Patient> out = new ArrayList<>();
 		Long leftID;
 		Long rightID;
@@ -201,16 +220,26 @@ public class EMR
 		int righti = 0;
 		
 		for (int i = 0; i < left.size() + right.size(); i++) {
-				
+			
+			// If all the elements of the left ArrayList are already in the merged ArrayList
+			// successively add all the remaining elements in the right ArrayList into the 
+			// merged ArrayList
 			if (lefti >= left.size()) {
 				out.add(right.get(righti));
 				righti++;
 			}
+			
+			// If all the elements of the right ArrayList are already in the merged ArrayList
+			// successively add all the remaining elements in the left ArrayList into the 
+			// merged ArrayList
 			else if (righti >= right.size()) {
 				out.add(left.get(lefti));
 				lefti++;
 			}
+			
 			else {
+				
+				// Add the lower valued ID at the current right and left index
 				leftID = Long.parseLong(left.get(lefti).getHospitalID());
 				rightID = Long.parseLong(right.get(righti).getHospitalID());	
 				if (leftID <= rightID) {
@@ -244,12 +273,18 @@ public class EMR
 		try {
 
 			Scanner reader = new Scanner(new File(doctorFilePath));
-				
+			
+			// Checks for commas as well as line breaks
 			reader.useDelimiter(",|\r\n");
 			
+			// To disregard the headers
 			for (int i = 0; i < 4; i++) {
 				reader.next();
 			}
+			
+			// Cycle through a full line of data and retrieve data in Strings
+			// If necessary convert these strings into the appropriate data type
+			// for the constructor of the Doctor class
 			while (reader.hasNext()) {
 				fName = reader.next();
 				lName = reader.next();
@@ -282,11 +317,18 @@ public class EMR
 		
 		try {
 			Scanner reader = new Scanner(new File(patientFilePath));
+			
+			// Checks for commas as well as line breaks
 			reader.useDelimiter(",|\r\n");
 			
+			// To disregard the headers
 			for (int i = 0; i < 7; i++) {
 				reader.next();
 			}
+			
+			// Cycle through a full line of data and retrieve data in Strings
+			// If necessary convert these strings into the appropriate data type
+			// for the constructor of the Patient class
 			while (reader.hasNext()) {
 				fName = reader.next();
 				lName = reader.next();
@@ -326,18 +368,25 @@ public class EMR
 		
 		try {
 			Scanner reader = new Scanner(new File(visitsFilePath));
-				
+			
+			// Checks for commas as well as line breaks
 			reader.useDelimiter(",|\r\n");
 			
+			// To disregard headers
 			for (int i = 0; i < 4; i++) {
 				reader.next();
 			}
+			
+			// Cycle through a full line of data and retrieve data in Strings
 			while (reader.hasNext()) {
 				hID = reader.next();
 				dID = reader.next();
 				date = reader.next();
 				note = reader.next();
 				
+				// Find the Doctor and Patient object based on the IDs retrieved
+				// from the CSV file and use them along with the other String
+				// data in the constructor for each Visit
 				for (int i = 0; i < patientList.size(); i++) {
 					if (patientList.get(i).getHospitalID().equals(hID)) {
 						patientList.get(i).aVisitList.add(new Visit(findDoctor(Long.parseLong(dID)), patientList.get(i), date, note));
@@ -446,7 +495,9 @@ public class EMR
 		String DOB = null;
 		Scanner scan = new Scanner(System.in);
 		
-		System.out.println("What is the patient's hospital ID (only decimal digits)?");
+		// Asks the user for the hospital ID of the patient, retrieves a String then
+		// parses it into a Long
+		System.out.print("Enter the patient's hospital ID (only decimal digits): ");
 		String hID = null;
 		boolean enteredHID = false;
 			while (!enteredHID) {
@@ -458,23 +509,27 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the hospital ID.");
+				System.out.print("Invalid number entered, please reenter the hospital ID: ");
 				hID = null;
 				enteredHID = false;
 			}
 		}
 
-		System.out.println("What is the patient's last name?");
+		// Asks the user for the last name of the patient, retrieves a String
+		System.out.print("Enter the patient's last name: ");
 		while (lastname == null) {
 			lastname = scan.nextLine();
 		}
 		
-		System.out.println("What is the patient's first name?");
+		// Asks the user for the first name of the patient, retrieves a String
+		System.out.print("Enter the patient's first name: ");
 		while (firstname == null) {
 			firstname = scan.nextLine();
 		}
 		
-		System.out.println("What is the patient's height (in cm)?");
+		// Asks the user for the height of the patient, retrieves a String then
+		// parses it into a double
+		System.out.print("Enter the patient's height (in cm): ");
 		String hgt = null;
 		boolean enteredHeight = false;
 			while (!enteredHeight) {
@@ -486,25 +541,30 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the height (in cm).");
+				System.out.print("Invalid number entered, please reenter the height (in cm): ");
 				hgt = null;
 				enteredHeight = false;
 			}
 		}
-			
-		System.out.println("What is the patient's gender?");
+		
+		// Asks the user for the gender of the patient, retrieves a String
+		System.out.print("Enter the patient's gender: ");
 		while (Gender == null) {
 			Gender = scan.nextLine();
 		}
 		
-		System.out.println("What is the patient's date of birth (mm-dd-yyyy)?");
+		// Asks the user for the date of birth of the patient, retrieves a String
+		System.out.print("Enter the patient's date of birth (mm-dd-yyyy): ");
 		while (DOB == null) {
 			DOB = scan.nextLine();
 		}
 		
+		// Asks the user for the Insurance type of the patient by giving 3 choices using a
+		// switch case
 		System.out.println("What is the patient's insurance type?");
 		System.out.println("Please select one of the following options and click enter:");
 		System.out.println("1. RAMQ\n" + "2. Private\n" + "3. None");
+		System.out.print("Enter here: ");
 		
 		int choice = 0;
 		String c = null;
@@ -530,7 +590,7 @@ public class EMR
 				type = Patient.Insurance.NONE;
 				break;
 			default:
-				System.out.println("Invalid number entered, please reenter.");
+				System.out.print("Invalid number entered, please reenter: ");
 				break;
 			}
 		}
@@ -552,7 +612,7 @@ public class EMR
 	 * user should not be able to enter empty values.
 	 */
 	private void option2(){
-		//TODO: Fill code here. Ask the user to supply by command-line values for all the variables below.
+
 		String firstname = null;
 		String lastname = null;
 		String specialty = null;
@@ -560,22 +620,27 @@ public class EMR
 		
 		Scanner scan = new Scanner(System.in);
 		
-		System.out.println("What is the doctor's last name?");
+		// Asks for the last name of the doctor, retrieves a String
+		System.out.print("Enter the doctor's last name: ");
 		while (lastname == null) {
 			lastname = scan.nextLine();
 		}
 		
-		System.out.println("What is the doctor's first name?");
+		// Asks for the first name of the doctor, retrieves a String
+		System.out.print("Enter the doctor's first name: ");
 		while (firstname == null) {
 			firstname = scan.nextLine();
 		}
 		
-		System.out.println("What is the doctor's specialty?");
+		// Asks for the specialty of the doctor, retrieves a String
+		System.out.print("Enter the doctor's specialty: ");
 		while (specialty == null) {
 			specialty = scan.nextLine();
 		}
 		
-		System.out.println("What is the doctor's ID (only decimal digits)?");
+		// Asks for the ID of a doctor, retrieves a String and then parses
+		// it into a Long
+		System.out.print("Enter the doctor's ID (only decimal digits): ");
 		String ID = null;
 		boolean enteredID = false;
 			while (!enteredID) {
@@ -587,7 +652,7 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the doctor's ID.");
+				System.out.print("Invalid number entered, please reenter the doctor's ID: ");
 				ID = null;
 				enteredID = false;
 			}
@@ -607,7 +672,7 @@ public class EMR
 	 * This method creates a Visit record. 
 	 */
 	private void option3(){
-		//TODO: Fill code here. Ask the user to supply by command-line values for all the variables below.
+
 		Long doctorID = null;
 		Long patientID = null;
 		String date = null;
@@ -618,7 +683,7 @@ public class EMR
 		
 		Scanner scan = new Scanner(System.in);
 		
-		// Doctor's ID
+		// Entering the doctor's ID, retrieves String and then is parsed to a Long
 		System.out.println("What is the doctor's ID (only decimal digits)?");
 		String dID = null;
 		boolean enteredDID = false;
@@ -635,6 +700,9 @@ public class EMR
 				dID = null;
 				enteredDID = false;
 			}
+			
+			// Uses the find doctor method to find the Doctor object associated with the ID
+			// specified. If no such doctor exists, the visit entry is aborted.
 			d = findDoctor(doctorID);
 			if (d == null) {
 				enteredDID = false;
@@ -643,7 +711,7 @@ public class EMR
 			}
 		}
 		
-		// Patients ID
+		// Entering the patient's ID, retrieves String and then is parsed to a Long
 		System.out.println("What is the patient's ID (only decimal digits)?");
 		String pID = null;
 		boolean enteredPID = false;
@@ -661,7 +729,7 @@ public class EMR
 				enteredPID = false;
 			}
 			
-			// Find the patient with the specified ID
+			// Find the patient with the specified ID, if no such doctor exists, the visit entry is aborted.
 			for (int i = 0; i < patientList.size(); i++) {
 				if (Long.parseLong(patientList.get(i).getHospitalID()) == patientID) {
 					p = patientList.get(i);
@@ -674,7 +742,7 @@ public class EMR
 			}
 		}
 		
-		// Date
+		// Enter the date of the visit
 		System.out.println("What is the date of the visit (mm-dd-yyyy)?");
 		while (date == null) {
 			date = scan.nextLine();
@@ -695,8 +763,7 @@ public class EMR
 	 * Insurance type, and date of birth could be changed. You should ask the user to supply the input.
 	 */
 	private void option4(){
-		//TODO: These are the 5 values that could change. You must ask the user to input new values 
-		// for each of the 5 variables
+
 		String newFirstname = null;
 		String newLastname = null;
 		double newHeight = 0;
@@ -706,7 +773,9 @@ public class EMR
 		Patient p = null;
 		Scanner scan = new Scanner(System.in);
 		
-		System.out.println("What is the patient's ID (only decimal digits)?");
+		// Asks the user for the hospital ID of the patient, retrieves a String then
+		// parses it into a Long
+		System.out.print("Enter the patient's ID to be editted (only decimal digits: ?");
 		String pID = null;
 		boolean enteredPID = false;
 			while (!enteredPID) {
@@ -718,12 +787,13 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the patient's ID.");
+				System.out.print("Invalid number entered, please reenter the patient's ID: ");
 				pID = null;
 				enteredPID = false;
 			}
 			
-			// Find the patient with the specified ID
+		
+			// Find the patient with the specified ID, if no such doctor exists, the visit entry is aborted.
 			for (int i = 0; i < patientList.size(); i++) {
 				if (Long.parseLong(patientList.get(i).getHospitalID()) == ID) {
 					p = patientList.get(i);
@@ -736,17 +806,21 @@ public class EMR
 			}
 		}
 
-		System.out.println("What is the patient's last name?");
+		// Asks the user for the last name of the patient, retrieves a String
+		System.out.print("Enter the patient's new last name: ");
 		while (newLastname == null) {
 			newLastname = scan.nextLine();
 		}
 		
-		System.out.println("What is the patient's first name?");
+		// Asks the user for the first name of the patient, retrieves a String
+		System.out.print("Enter the patient's new first name?");
 		while (newFirstname == null) {
 			newFirstname = scan.nextLine();
 		}
 		
-		System.out.println("What is the patient's height (in cm)?");
+		// Asks the user for the height of the patient, retrieves a String then
+		// parses it into a double
+		System.out.print("Enter the patient's new height (in cm): ");
 		String hgt = null;
 		boolean enteredHeight = false;
 			while (!enteredHeight) {
@@ -758,20 +832,24 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the height (in cm).");
+				System.out.print("Invalid number entered, please reenter the height (in cm): ");
 				hgt = null;
 				enteredHeight = false;
 			}
 		}
 		
-		System.out.println("What is the patient's date of birth (mm-dd-yyyy)?");
+		// Asks the user for the date of birth of the patient, retrieves a String
+		System.out.print("Enter the patient's date of birth (mm-dd-yyyy): ");
 		while (newDOB == null) {
 			newDOB = scan.nextLine();
 		}
 		
+		// Asks the user for the Insurance type of the patient by giving 3 choices using a
+		// switch case
 		System.out.println("What is the patient's insurance type?");
 		System.out.println("Please select one of the following options and click enter:");
 		System.out.println("1. RAMQ\n" + "2. Private\n" + "3. None");
+		System.out.print("Enter here: ");
 		
 		int choice = 0;
 		String c = null;
@@ -797,7 +875,7 @@ public class EMR
 				newType = Patient.Insurance.NONE;
 				break;
 			default:
-				System.out.println("Invalid number entered, please reenter.");
+				System.out.print("Invalid number entered, please reenter: ");
 				break;
 			}
 		}
@@ -810,7 +888,7 @@ public class EMR
 	 * Insurance type, address could be changed, and date of birth. 
 	 */
 	private void editPatient(String firstname, String lastname, double height, Insurance type, String DOB, Long ID){
-		//TODO: Fill code here
+
 		Patient p = null;
 		
 		// Find the patient with the specified ID
@@ -820,6 +898,7 @@ public class EMR
 			}
 		}
 		
+		// Change all the values of the specified patient
 		if (p == null) {
 			System.out.println("The ID entered does not exist, edit aborted.");
 		}
@@ -848,6 +927,8 @@ public class EMR
 	 */
 	private void displayPatients(ArrayList<Patient> patients){
 
+		// Loops and prints out the values of all patients
+		System.out.println("List of all patients:");
 		System.out.println("Hospital ID" + ",\t" +
 				"Last Name" + ",\t" +
 				"First Name" + ",\t" +
@@ -855,6 +936,7 @@ public class EMR
 				"Height" + ",\t" +
 				"Date Of Birth" + ",\t" +
 				"Insurance");
+		System.out.println();
 		for (int i = 0; i < patients.size(); i++) {
 			System.out.println(patients.get(i).toString());
 		}
@@ -875,10 +957,14 @@ public class EMR
 	 * one Doctor at a time by calling the Doctor toString() method
 	 */
 	private void displayDoctors(ArrayList<Doctor> docs){
+		
+		// Loops and prints out the values of all doctors
+		System.out.println("List of all doctors:");
 		System.out.println("ID" + ",\t" +
 				"Last Name" + ",\t" +
 				"First Name" + ",\t" +
 				"Specialty");
+		System.out.println();
 		for (int i = 0; i < docs.size(); i++) {
 			System.out.println(docs.get(i).toString());
 		}
@@ -893,7 +979,9 @@ public class EMR
 		Long patientID = null;
 		Scanner scan = new Scanner(System.in);
 
-		System.out.println("What is the patient's ID (only decimal digits)?");
+		// Asks the user for the hospital ID of the patient, retrieves a String then
+		// parses it into a Long
+		System.out.print("Enter the patient's ID (only decimal digits): ");
 		String pID = null;
 		boolean enteredPID = false;
 		while (!enteredPID) {
@@ -905,7 +993,7 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the patient's ID.");
+				System.out.print("Invalid number entered, please reenter the patient's ID: ");
 				pID = null;
 				enteredPID = false;
 			}
@@ -925,6 +1013,7 @@ public class EMR
 		Patient currentPatient = null;
 		Long currentID;
 		
+		// Find the patient with the given ID
 		for (int i = 0; i < patientList.size(); i++) {
 			currentID = Long.parseLong(patientList.get(i).getHospitalID());
 			if (currentID.equals(patientID)) {
@@ -932,11 +1021,16 @@ public class EMR
 			}
 		}
 		
+		// Returns nothing if the patient does not exist
 		if (currentPatient == null) {
+			System.out.println("This patient is not in the records.");
+			System.out.println();
 			return;
 		}
+		
 		else {
 			
+			// Prints the values of the patient specified
 			System.out.println("Patient:");
 			System.out.println("Hospital ID" + ",\t" +
 					"Last Name" + ",\t" +
@@ -949,18 +1043,24 @@ public class EMR
 			System.out.println(currentPatient.toString());
 			System.out.println();
 			
+			// If the patient has not visited any doctors, return
 			if (currentPatient.aVisitList == null) {
+				System.out.println("This patient has not visited any doctors.");
+				System.out.println();
 				return;
 			}
+			
 			else {
 				sortVisitList(currentPatient);
 				
+				// Loops through all the visits of the patient and prints the data
 				System.out.println("Visits:");
 				System.out.println("Doctor ID" + ",\t" +
 						"Last Name" + ",\t" +
 						"First Name" + ",\t" +
 						"Visit Date" + ",\t" +
 						"Note");
+				System.out.println();
 				for (int i = 0; i < currentPatient.aVisitList.size(); i++) {
 					System.out.println(currentPatient.aVisitList.get(i).toString());
 				}
@@ -973,8 +1073,8 @@ public class EMR
 
 	/**
 	 * Takes in a string that represents the date and returns a chronological value used for sorting.
-	 * @param date String in format YYYY-MM-DD
-	 * @return a chronological value used for sorting
+	 * @param date String in format mm-dd-yyyy
+	 * @return a chronological value used for sorting in format yyyymmdd
 	 */
 	private int toDayCount(String date) {
 		
@@ -1007,7 +1107,7 @@ public class EMR
 				break;
 			}
 			
-			// Bubblesort the elements of the Arraylist
+			// Bubble sort the elements of the ArrayList
 			if (p.aVisitList.size() > 1) {
 				for (int i = 0; i < p.aVisitList.size() - 1; i++) {
 					visitLeft = p.aVisitList.get(i);
@@ -1031,7 +1131,9 @@ public class EMR
 		
 		Scanner scan = new Scanner(System.in);
 		
-		System.out.println("What is the doctor's ID (only decimal digits)?");
+		// Asks the user to enter the doctor's ID, retrieves a String and then
+		// parses it into a Long
+		System.out.print("Enter the doctor's ID (only decimal digits): ");
 		String dID = null;
 		boolean enteredDID = false;
 		while (!enteredDID) {
@@ -1043,34 +1145,46 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the patient's ID.");
+				System.out.print("Invalid number entered, please reenter the doctor's ID: ");
 				dID = null;
 				enteredDID = false;
 			}
 		}
 		
+		// Finds the specified doctor and then prints its records
 		Doctor d = findDoctor(doc_id);
 		printDoctorRecord(d);
 	}
 	
 	/**
 	 * Searches in O(log n) time the doctorList to find the correct doctor with doctorID = id
-	 * @param id
+	 * @param id The ID number of the doctor
 	 * @return
 	 */
 	private Doctor findDoctor(Long id){
 		
-		int iterator;
-		int action;
+		int iterator; // Variable for the current position in the ArrayList 
+		int action; // Variable to indicate what action should be taken at each iteration
 		
+		// If there are no doctors return nothing.
 		if (doctorList == null) {
 			return null;
 		}
 		
+		// Begin with the iterator at the middle of the ArrayList
 		iterator = doctorList.size()/2;
 		
+		// If the iterator ever points to a position outside the ArrayList this indicates
+		// that there are no doctors with the specified id in the list, thus null is
+		// returned
 		while ((iterator >= 0) && (iterator < doctorList.size())) {
 			
+			/* Check if the ID is greater than, less than, or equal to the
+			*  ID of the doctor which is pointed by the position of the
+			*  iterator. If equal (action == 0) return the doctor at iterator,
+			*  if less than (action < 0) halve the iterator, if greater than
+			*  (action > 0) add half to the iterator.
+			*/ 
 			action = id.compareTo(doctorList.get(iterator).getID());
 			
 			if (action == 0) {
@@ -1096,6 +1210,7 @@ public class EMR
 		
 		boolean patientSeen;
 		
+		// Prints out the information of the doctor
 		System.out.println("Doctor:");
 		System.out.println("ID" + ",\t" +
 				"Last Name" + ",\t" +
@@ -1104,6 +1219,9 @@ public class EMR
 		System.out.println(d.toString());
 		System.out.println();
 
+		// Cycles through each patient and checks to see if they have made any visits to the
+		// specified doctor. If they have it prints out all the days they have visited the
+		// specified doctor.
 		if (patientList != null) {
 			for (int i = 0; i < patientList.size(); i++) {
 				patientSeen = false;
@@ -1159,6 +1277,8 @@ public class EMR
 		// Write doctor file
 		try
 		{
+			
+			// Deletes the old CSV file to make a new one with all the new data
 			File docFile = new File(aDoctorFilePath);
 			docFile.delete();
 		    FileWriter writer = new FileWriter(aDoctorFilePath);
@@ -1173,7 +1293,7 @@ public class EMR
 		    writer.append("DoctorID");
 		    writer.append("\r\n");
 	 
-		    // Write data to doctor file
+		    // Add all data in the doctorList ArrayList to doctor file
 		    for (int i = 0; i < doctorList.size(); i++) {
 			    writer.append(doctorList.get(i).getFirstName());
 			    writer.append(',');
@@ -1196,6 +1316,7 @@ public class EMR
 		// Write patient file
 		try
 		{
+			// Deletes the old CSV file to make a new one with all the new data
 			File docFile = new File(aPatientFilePath);
 			docFile.delete();
 		    FileWriter writer = new FileWriter(aPatientFilePath);
@@ -1216,7 +1337,7 @@ public class EMR
 		    writer.append("Date of Birth (mm-dd-yyyy)");
 		    writer.append("\r\n");
 	 
-		    // Write data to patients file
+		    // Add all data in the patientList ArrayList to patients file
 		    for (int i = 0; i < patientList.size(); i++) {
 			    writer.append(patientList.get(i).getFirstName());
 			    writer.append(',');
@@ -1246,6 +1367,7 @@ public class EMR
 		// Write visits file
 		try
 		{
+			// Deletes the old CSV file to make a new one with all the new data
 			File docFile = new File(aVisitsFilePath);
 			docFile.delete();
 		    FileWriter writer = new FileWriter(aVisitsFilePath);
@@ -1260,7 +1382,7 @@ public class EMR
 		    writer.append("DoctorNote");
 		    writer.append("\r\n");
 	 
-		    // Write data to patients file
+		    // Add all data from aVisitList from each Patient in the patientList ArrayList to visits file
 		    for (int i = 0; i < patientList.size(); i++) {
 		    	for (int j = 0; j < patientList.get(i).aVisitList.size(); j++) {
 		    		writer.append(patientList.get(i).aVisitList.get(j).getPatient().getHospitalID());
@@ -1378,6 +1500,7 @@ class Patient
 	 */
 	public String toString(){
 		
+		// Concatenates a string using all the required information
 		String output = this.getHospitalID() + ",\t" +
 				this.getLastName() + ",\t" +
 				this.getFirstName() + ",\t" +
@@ -1432,6 +1555,7 @@ class Doctor
 	 */
 	public String toString(){
 		
+		// Concatenates a String using all the required information
 		String output = this.getID() + ",\t" +
 				this.getLastName() + ",\t" +
 				this.getFirstName() + ",\t" +
@@ -1482,6 +1606,7 @@ class Visit
 
 	public String toString() {
 		
+		// Concatenates a String using all the required information
 		String output = this.getDoctor().getID() + ",\t" +
 				this.getDoctor().getLastName() + ",\t" +
 				this.getDoctor().getFirstName() + ",\t" +

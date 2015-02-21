@@ -1,5 +1,6 @@
 package assignment2;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +20,7 @@ import assignment2.Patient.Insurance;
  * 15/02/2015: Finished options 3 to 5 and associated methods. Problem with reading files.
  * 16/02/2015: Finished option 6. Fixed file reading issue. Various bug fixes.
  * 19/02/2015: Finished option 7.
+ * 20/02/2015: Finished option 8 and 9.
  */
 
 /* ACADEMIC INTEGRITY STATEMENT
@@ -347,9 +349,6 @@ public class EMR
 		catch(FileNotFoundException a) {}
 
 	}
-		
-		
-		//TODO: Fill code here
 	
 	/**
 	 * This method uses an infinite loop to simulate the interface of the EMR system.
@@ -420,6 +419,7 @@ public class EMR
 					break;
 				case 9: 
 					option9();
+					exit = true;
 					break;	
 				default:
 					System.out.println("   *** ERROR: You entered an invalid input, please try again ***\n");
@@ -600,7 +600,7 @@ public class EMR
 	 * This method adds a doctor to the end of the doctorList ArrayList.
 	 */
 	private void addDoctor(String firstname, String lastname, String specialty, Long docID){
-		//TODO: Fill code here
+		doctorList.add(new Doctor(firstname, lastname, specialty, docID));
 	}
 	
 	/**
@@ -847,7 +847,7 @@ public class EMR
 	 * one Patient at a time by calling the Patient toString() method
 	 */
 	private void displayPatients(ArrayList<Patient> patients){
-		//TODO: Fill code here. Loop through all patients and call toString method
+
 		System.out.println("Hospital ID" + ",\t" +
 				"Last Name" + ",\t" +
 				"First Name" + ",\t" +
@@ -1026,8 +1026,28 @@ public class EMR
 	 * This method should ask the user to supply an id of a doctor they want info about
 	 */
 	private void option8(){
-		//TODO: ask the user to specify the id of the doctor
+
 		Long doc_id = null;
+		
+		Scanner scan = new Scanner(System.in);
+		
+		System.out.println("What is the doctor's ID (only decimal digits)?");
+		String dID = null;
+		boolean enteredDID = false;
+		while (!enteredDID) {
+			try {
+				while (dID == null) {
+					dID = scan.nextLine();
+					doc_id = Long.parseLong(dID);
+					enteredDID = true;
+				}
+			}
+			catch (NumberFormatException e) {
+				System.out.println("Invalid number entered, please reenter the patient's ID.");
+				dID = null;
+				enteredDID = false;
+			}
+		}
 		
 		Doctor d = findDoctor(doc_id);
 		printDoctorRecord(d);
@@ -1073,7 +1093,52 @@ public class EMR
 	 * method as well. It should also list the date that the doctor saw a particular patient
 	 */
 	private void printDoctorRecord(Doctor d){
-		//TODO: Fill code here
+		
+		boolean patientSeen;
+		
+		System.out.println("Doctor:");
+		System.out.println("ID" + ",\t" +
+				"Last Name" + ",\t" +
+				"First Name" + ",\t" +
+				"Specialty");
+		System.out.println(d.toString());
+		System.out.println();
+
+		if (patientList != null) {
+			for (int i = 0; i < patientList.size(); i++) {
+				patientSeen = false;
+				if (patientList.get(i).aVisitList != null) {
+					sortVisitList(patientList.get(i));
+					for (int j = 0; j < patientList.get(i).aVisitList.size(); j++) {
+						if (patientList.get(i).aVisitList.get(j).getDoctor().equals(d)) {
+							if (!patientSeen) {
+								System.out.println("Patient:");
+								System.out.println("Hospital ID" + ",\t" +
+										"Last Name" + ",\t" +
+										"First Name" + ",\t" +
+										"Gender" + ",\t" +
+										"Height" + ",\t" +
+										"Date Of Birth" + ",\t" +
+										"Insurance");
+								System.out.println(patientList.get(i).toString());
+								System.out.println("Seen on:");
+								System.out.println(patientList.get(i).aVisitList.get(j).getDate());
+								patientSeen = true;
+							}
+							else {
+								System.out.println(patientList.get(i).aVisitList.get(j).getDate());
+							}
+						}						
+					}
+				}
+				
+				if (patientSeen) { 
+					System.out.println();
+				}
+				
+			}
+		}
+		
 	}
 	
 	/**
@@ -1090,7 +1155,132 @@ public class EMR
 	 * Export all the Doctor, Patient and Visit data by overwriting the contents of the 3 original csv files.
 	 */
 	private void exitAndSave(){
-		//TODO: Fill code here
+		
+		// Write doctor file
+		try
+		{
+			File docFile = new File(aDoctorFilePath);
+			docFile.delete();
+		    FileWriter writer = new FileWriter(aDoctorFilePath);
+	 
+		    // Header
+		    writer.append("Firstname");
+		    writer.append(',');
+		    writer.append("Lastname");
+		    writer.append(',');
+		    writer.append("Specialty");
+		    writer.append(',');
+		    writer.append("DoctorID");
+		    writer.append("\r\n");
+	 
+		    // Write data to doctor file
+		    for (int i = 0; i < doctorList.size(); i++) {
+			    writer.append(doctorList.get(i).getFirstName());
+			    writer.append(',');
+			    writer.append(doctorList.get(i).getLastName());
+			    writer.append(',');
+			    writer.append(doctorList.get(i).getSpecialty());
+			    writer.append(',');
+			    writer.append(doctorList.get(i).getID().toString());
+			    writer.append("\r\n");
+		    }
+	  
+		    writer.flush();
+
+		}
+		catch(IOException e)
+		{
+		     e.printStackTrace();
+		}
+		
+		// Write patient file
+		try
+		{
+			File docFile = new File(aPatientFilePath);
+			docFile.delete();
+		    FileWriter writer = new FileWriter(aPatientFilePath);
+		    
+		    // Header
+		    writer.append("FirstName");
+		    writer.append(',');
+		    writer.append("LastName");
+		    writer.append(',');
+		    writer.append("Hight (cm)");
+		    writer.append(',');
+		    writer.append("Insurance");
+		    writer.append(',');
+		    writer.append("Gender");
+		    writer.append(',');
+		    writer.append("HospitalID");
+		    writer.append(',');
+		    writer.append("Date of Birth (mm-dd-yyyy)");
+		    writer.append("\r\n");
+	 
+		    // Write data to patients file
+		    for (int i = 0; i < patientList.size(); i++) {
+			    writer.append(patientList.get(i).getFirstName());
+			    writer.append(',');
+			    writer.append(patientList.get(i).getLastName());
+			    writer.append(',');
+			    writer.append(patientList.get(i).getHeight());
+			    writer.append(',');
+			    writer.append(patientList.get(i).getInsurance());
+			    writer.append(',');
+			    writer.append(patientList.get(i).getGender());
+			    writer.append(',');
+			    writer.append(patientList.get(i).getHospitalID());
+			    writer.append(',');
+			    writer.append(patientList.get(i).getDateOfBirth());
+			    writer.append("\r\n");
+		    }
+	  
+		    writer.flush();
+
+		}
+		catch(IOException e)
+		{
+		     e.printStackTrace();
+		}
+		
+		
+		// Write visits file
+		try
+		{
+			File docFile = new File(aVisitsFilePath);
+			docFile.delete();
+		    FileWriter writer = new FileWriter(aVisitsFilePath);
+		    
+		    // Header
+		    writer.append("HospitalID");
+		    writer.append(',');
+		    writer.append("DoctorID");
+		    writer.append(',');
+		    writer.append("Date");
+		    writer.append(',');
+		    writer.append("DoctorNote");
+		    writer.append("\r\n");
+	 
+		    // Write data to patients file
+		    for (int i = 0; i < patientList.size(); i++) {
+		    	for (int j = 0; j < patientList.get(i).aVisitList.size(); j++) {
+		    		writer.append(patientList.get(i).aVisitList.get(j).getPatient().getHospitalID());
+		    		writer.append(',');
+		    		writer.append(patientList.get(i).aVisitList.get(j).getDoctor().getID().toString());
+		    		writer.append(',');
+		    		writer.append(patientList.get(i).aVisitList.get(j).getDate());
+		    		writer.append(',');
+		    		writer.append(patientList.get(i).aVisitList.get(j).getNote());
+		    		writer.append("\r\n");
+		    	}
+		    }
+	  
+		    writer.flush();
+
+		}
+		catch(IOException e)
+		{
+		     e.printStackTrace();
+		}
 	}
 	
 }
@@ -1137,6 +1327,18 @@ class Patient
 		return aLastName;
 	}
 
+	public String getHeight() {
+		return Double.toString(aHeight);
+	}
+	
+	public String getGender() {
+		return aGender;
+	}
+	
+	public String getInsurance() {
+		return aInsurance.toString();
+	}
+	
 	public String getHospitalID()
 	{
 		return aHospitalID.toString();

@@ -22,6 +22,7 @@ import assignment2.Patient.Insurance;
  * 19/02/2015: Finished option 7.
  * 20/02/2015: Finished option 8 and 9.
  * 21/02/2015: Refined comments, enhanced UI and tested code for bugs.
+ * 21/02/2015: Cleaned up UI, added date validation.
  */
 
 /* ACADEMIC INTEGRITY STATEMENT
@@ -557,6 +558,13 @@ public class EMR
 		System.out.print("Enter the patient's date of birth (mm-dd-yyyy): ");
 		while (DOB == null) {
 			DOB = scan.nextLine();
+			
+			// Checks to see if the date entered is a valid date
+			if (!checkValidDate(DOB)) {
+				System.out.print("Invalid date entered, please reenter: ");
+				DOB = null;
+			}
+			
 		}
 		
 		// Asks the user for the Insurance type of the patient by giving 3 choices using a
@@ -596,6 +604,44 @@ public class EMR
 		}
 		
 		addPatient(firstname, lastname, height, Gender, type, hospitalID, DOB);
+		System.out.println();
+	}
+
+	/**
+	 * Checks to see if a date is in the form mm-dd-yyyy
+	 * @param date A String that is to represent a date.
+	 * @return True if the date in the String is of form mm-dd-yyyy
+	 */
+	private boolean checkValidDate(String date) {
+		
+		char[] dateChars;
+		
+		// If the String is not the proper length return false.
+		if (date.length() != 10) {
+			return false;
+		}
+		
+		dateChars = date.toCharArray();
+		
+		// Checks to see if the month, day, and year parts of the date are digits
+		// Also checks for the hyphens to make sure they are in the correct place
+		for (int i = 0; i < date.length(); i++) {
+			
+			if ((i != 2) && (i != 5)) {
+				if (!Character.isDigit(dateChars[i])) {
+					return false;
+				}
+			}
+			else {
+				if (dateChars[i] != '-') {
+					return false;
+				}
+			}
+			
+		}
+		
+		return true;
+		
 	}
 	
 	/**
@@ -658,6 +704,7 @@ public class EMR
 			}
 		}
 		
+		System.out.println();
 		addDoctor(firstname, lastname, specialty, doctor_id);
 	}
 	
@@ -684,7 +731,7 @@ public class EMR
 		Scanner scan = new Scanner(System.in);
 		
 		// Entering the doctor's ID, retrieves String and then is parsed to a Long
-		System.out.println("What is the doctor's ID (only decimal digits)?");
+		System.out.print("Enter the doctor's ID (only decimal digits): ");
 		String dID = null;
 		boolean enteredDID = false;
 			while (!enteredDID) {
@@ -696,7 +743,7 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the doctor's ID.");
+				System.out.print("Invalid number entered, please reenter the doctor's ID: ");
 				dID = null;
 				enteredDID = false;
 			}
@@ -712,7 +759,7 @@ public class EMR
 		}
 		
 		// Entering the patient's ID, retrieves String and then is parsed to a Long
-		System.out.println("What is the patient's ID (only decimal digits)?");
+		System.out.print("Enter the patient's ID (only decimal digits): ");
 		String pID = null;
 		boolean enteredPID = false;
 			while (!enteredPID) {
@@ -724,7 +771,7 @@ public class EMR
 				}
 			}
 			catch (NumberFormatException e) {
-				System.out.println("Invalid number entered, please reenter the patient's ID.");
+				System.out.print("Invalid number entered, please reenter the patient's ID: ");
 				pID = null;
 				enteredPID = false;
 			}
@@ -743,12 +790,20 @@ public class EMR
 		}
 		
 		// Enter the date of the visit
-		System.out.println("What is the date of the visit (mm-dd-yyyy)?");
+		System.out.print("Enter the date of the visit (mm-dd-yyyy): ");
 		while (date == null) {
 			date = scan.nextLine();
+			
+			// Checks to see if the date entered is a valid date
+			if (!checkValidDate(date)) {
+				System.out.print("Invalid date entered, please reenter: ");
+				date = null;
+			}
+			
 		}
 		
 		recordPatientVisit(d, p, date);
+		System.out.println();
 	}
 	
 	/**
@@ -775,7 +830,7 @@ public class EMR
 		
 		// Asks the user for the hospital ID of the patient, retrieves a String then
 		// parses it into a Long
-		System.out.print("Enter the patient's ID to be editted (only decimal digits: ?");
+		System.out.print("Enter the patient's ID to be editted (only decimal digits: ");
 		String pID = null;
 		boolean enteredPID = false;
 			while (!enteredPID) {
@@ -813,7 +868,7 @@ public class EMR
 		}
 		
 		// Asks the user for the first name of the patient, retrieves a String
-		System.out.print("Enter the patient's new first name?");
+		System.out.print("Enter the patient's new first name: ");
 		while (newFirstname == null) {
 			newFirstname = scan.nextLine();
 		}
@@ -842,6 +897,12 @@ public class EMR
 		System.out.print("Enter the patient's date of birth (mm-dd-yyyy): ");
 		while (newDOB == null) {
 			newDOB = scan.nextLine();
+			
+			// Checks to see if the date entered is a valid date
+			if (!checkValidDate(newDOB)) {
+				System.out.print("Invalid date entered, please reenter: ");
+				newDOB = null;
+			}
 		}
 		
 		// Asks the user for the Insurance type of the patient by giving 3 choices using a
@@ -880,6 +941,7 @@ public class EMR
 			}
 		}
 		
+		System.out.println();
 		editPatient(newFirstname, newLastname, newHeight, newType, newDOB, ID);
 	}
 	
@@ -1151,6 +1213,8 @@ public class EMR
 			}
 		}
 		
+		System.out.println();
+		
 		// Finds the specified doctor and then prints its records
 		Doctor d = findDoctor(doc_id);
 		printDoctorRecord(d);
@@ -1216,6 +1280,7 @@ public class EMR
 				"Last Name" + ",\t" +
 				"First Name" + ",\t" +
 				"Specialty");
+		System.out.println();
 		System.out.println(d.toString());
 		System.out.println();
 
@@ -1227,7 +1292,7 @@ public class EMR
 				patientSeen = false;
 				if (patientList.get(i).aVisitList != null) {
 					sortVisitList(patientList.get(i));
-					for (int j = 0; j < patientList.get(i).aVisitList.size(); j++) {
+					for (int j = patientList.get(i).aVisitList.size() - 1; j >= 0; j--) {
 						if (patientList.get(i).aVisitList.get(j).getDoctor().equals(d)) {
 							if (!patientSeen) {
 								System.out.println("Patient:");
@@ -1238,7 +1303,9 @@ public class EMR
 										"Height" + ",\t" +
 										"Date Of Birth" + ",\t" +
 										"Insurance");
+								System.out.println();
 								System.out.println(patientList.get(i).toString());
+								System.out.println();
 								System.out.println("Seen on:");
 								System.out.println(patientList.get(i).aVisitList.get(j).getDate());
 								patientSeen = true;

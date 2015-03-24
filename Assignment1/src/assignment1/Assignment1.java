@@ -337,7 +337,7 @@ public class Assignment1
 		// the corresponding indices for the stop words are replaced with null
 		for (int i = 0; i < STOP_WORDS.length; i++) {
 			index = Arrays.binarySearch(pKeyWords, STOP_WORDS[i]);
-			if (index > 0) {
+			if (index >= 0) {
 				
 				for (int j = index; j < pKeyWords.length; j++) {
 					if (pKeyWords[index].equals(pKeyWords[j])) {
